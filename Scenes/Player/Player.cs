@@ -178,4 +178,17 @@ public partial class Player : CharacterBody2D
 			}
 		}
 	}
+
+    private void _OnArea2dBodyEntered(Node2D body) // This signal is connected via the Godot editor
+    {
+        // Restart the game when the player falls in the void
+        if (body is Player)
+            RestartGame(GetTree());
+    }
+
+    private static void RestartGame(SceneTree tree)
+    {
+        PackedScene packed = ResourceLoader.Load<PackedScene>(tree.CurrentScene.SceneFilePath);
+        tree.CallDeferred(SceneTree.MethodName.ChangeSceneToPacked, packed); // CallDeferred required or editor will error out
+    }
 }
