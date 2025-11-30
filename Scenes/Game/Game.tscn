@@ -1,0 +1,117 @@
+[gd_scene load_steps=5 format=4 uid="uid://d4dvil151o4pw"]
+
+[ext_resource type="Texture2D" uid="uid://ci41l0ia88j4a" path="res://assets/tileset/Tileset.png" id="1_rdw05"]
+[ext_resource type="PackedScene" uid="uid://v8cl1k47mphc" path="res://Scenes/Player/Player.tscn" id="2_gwu2e"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_gwu2e"]
+texture = ExtResource("1_rdw05")
+0:0/0 = 0
+0:0/0/terrain_set = 0
+0:0/0/terrain = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+0:0/0/terrains_peering_bit/right_side = 0
+0:0/0/terrains_peering_bit/bottom_side = 0
+1:0/0 = 0
+1:0/0/terrain_set = 0
+1:0/0/terrain = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:0/0/terrains_peering_bit/right_side = 0
+1:0/0/terrains_peering_bit/bottom_side = 0
+1:0/0/terrains_peering_bit/left_side = 0
+2:0/0 = 0
+2:0/0/terrain_set = 0
+2:0/0/terrain = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:0/0/terrains_peering_bit/bottom_side = 0
+2:0/0/terrains_peering_bit/left_side = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+0:1/0 = 0
+0:1/0/terrain_set = 0
+0:1/0/terrain = 0
+0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+0:1/0/terrains_peering_bit/right_side = 0
+0:1/0/terrains_peering_bit/bottom_side = 0
+0:1/0/terrains_peering_bit/top_side = 0
+1:1/0 = 0
+1:1/0/terrain_set = 0
+1:1/0/terrain = 0
+1:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:1/0/terrains_peering_bit/right_side = 0
+1:1/0/terrains_peering_bit/bottom_side = 0
+1:1/0/terrains_peering_bit/left_side = 0
+1:1/0/terrains_peering_bit/top_side = 0
+2:1/0 = 0
+2:1/0/terrain_set = 0
+2:1/0/terrain = 0
+2:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:1/0/terrains_peering_bit/bottom_side = 0
+2:1/0/terrains_peering_bit/left_side = 0
+2:1/0/terrains_peering_bit/top_side = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+6:1/0 = 0
+0:2/0 = 0
+0:2/0/terrain_set = 0
+0:2/0/terrain = 0
+0:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+0:2/0/terrains_peering_bit/right_side = 0
+0:2/0/terrains_peering_bit/top_side = 0
+1:2/0 = 0
+1:2/0/terrain_set = 0
+1:2/0/terrain = 0
+1:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:2/0/terrains_peering_bit/right_side = 0
+1:2/0/terrains_peering_bit/left_side = 0
+1:2/0/terrains_peering_bit/top_side = 0
+2:2/0 = 0
+2:2/0/terrain_set = 0
+2:2/0/terrain = 0
+2:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:2/0/terrains_peering_bit/left_side = 0
+2:2/0/terrains_peering_bit/top_side = 0
+3:2/0 = 0
+4:2/0 = 0
+5:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+4:3/0 = 0
+5:3/0 = 0
+6:3/0 = 0
+7:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+2:4/0 = 0
+3:4/0 = 0
+4:4/0 = 0
+5:4/0 = 0
+6:4/0 = 0
+7:4/0 = 0
+0:5/0 = 0
+1:5/0 = 0
+2:5/0 = 0
+3:5/0 = 0
+4:5/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_xbxml"]
+physics_layer_0/collision_layer = 1
+terrain_set_0/mode = 2
+terrain_set_0/terrain_0/name = "Terrain 0"
+terrain_set_0/terrain_0/color = Color(0, 0.45273423, 0.37563965, 1)
+sources/0 = SubResource("TileSetAtlasSource_gwu2e")
+
+[node name="Game" type="Node2D"]
+
+[node name="TileMapLayer" type="TileMapLayer" parent="."]
+position = Vector2(-7, 24)
+tile_map_data = PackedByteArray("AAAmACYAAAACAAIAAAAmACUAAAACAAEAAAAmACQAAAACAAEAAAAmACMAAAACAAAAAAAlACYAAAABAAIAAAAlACUAAAABAAEAAAAlACQAAAABAAEAAAAlACMAAAABAAAAAAAkACYAAAABAAIAAAAkACUAAAABAAEAAAAkACQAAAABAAEAAAAkACMAAAABAAAAAAAjACYAAAABAAIAAAAjACUAAAABAAEAAAAjACQAAAABAAEAAAAjACMAAAABAAAAAAAiACYAAAABAAIAAAAiACUAAAABAAEAAAAiACQAAAABAAEAAAAiACMAAAABAAAAAAAhACYAAAABAAIAAAAhACUAAAABAAEAAAAhACQAAAABAAEAAAAhACMAAAABAAAAAAAgACYAAAABAAIAAAAgACUAAAABAAEAAAAgACQAAAABAAEAAAAgACMAAAABAAAAAAAfACYAAAABAAIAAAAfACUAAAABAAEAAAAfACQAAAABAAEAAAAfACMAAAABAAAAAAAeACYAAAABAAIAAAAeACUAAAABAAEAAAAeACQAAAABAAEAAAAeACMAAAABAAAAAAAdACYAAAABAAIAAAAdACUAAAABAAEAAAAdACQAAAABAAEAAAAdACMAAAABAAAAAAAcACYAAAABAAIAAAAcACUAAAABAAEAAAAcACQAAAABAAEAAAAcACMAAAABAAAAAAAbACYAAAABAAIAAAAbACUAAAABAAEAAAAbACQAAAABAAEAAAAbACMAAAABAAAAAAAaACYAAAABAAIAAAAaACUAAAABAAEAAAAaACQAAAABAAEAAAAaACMAAAABAAAAAAAZACYAAAABAAIAAAAZACUAAAABAAEAAAAZACQAAAABAAEAAAAZACMAAAABAAAAAAAYACYAAAABAAIAAAAYACUAAAABAAEAAAAYACQAAAABAAEAAAAYACMAAAABAAAAAAAXACYAAAABAAIAAAAXACUAAAABAAEAAAAXACQAAAABAAEAAAAXACMAAAABAAAAAAAWACYAAAABAAIAAAAWACUAAAABAAEAAAAWACQAAAABAAEAAAAWACMAAAABAAAAAAAVACYAAAABAAIAAAAVACUAAAABAAEAAAAVACQAAAABAAEAAAAVACMAAAABAAAAAAAUACYAAAABAAIAAAAUACUAAAABAAEAAAAUACQAAAABAAEAAAAUACMAAAABAAAAAAATACYAAAABAAIAAAATACUAAAABAAEAAAATACQAAAABAAEAAAATACMAAAABAAAAAAASACYAAAABAAIAAAASACUAAAABAAEAAAASACQAAAABAAEAAAASACMAAAABAAAAAAARACYAAAABAAIAAAARACUAAAABAAEAAAARACQAAAABAAEAAAARACMAAAABAAAAAAAQACYAAAABAAIAAAAQACUAAAABAAEAAAAQACQAAAABAAEAAAAQACMAAAABAAAAAAAPACYAAAABAAIAAAAPACUAAAABAAEAAAAPACQAAAABAAEAAAAPACMAAAABAAAAAAAOACYAAAABAAIAAAAOACUAAAABAAEAAAAOACQAAAABAAEAAAAOACMAAAABAAAAAAANACYAAAABAAIAAAANACUAAAABAAEAAAANACQAAAABAAEAAAANACMAAAABAAAAAAAMACYAAAABAAIAAAAMACUAAAABAAEAAAAMACQAAAABAAEAAAAMACMAAAABAAAAAAALACYAAAABAAIAAAALACUAAAABAAEAAAALACQAAAABAAEAAAALACMAAAABAAAAAAAKACYAAAABAAIAAAAKACUAAAABAAEAAAAKACQAAAABAAEAAAAKACMAAAABAAAAAAAJACYAAAABAAIAAAAJACUAAAABAAEAAAAJACQAAAABAAEAAAAJACMAAAABAAAAAAAIACYAAAABAAIAAAAIACUAAAABAAEAAAAIACQAAAABAAEAAAAIACMAAAABAAAAAAAHACYAAAAAAAIAAAAHACUAAAAAAAEAAAAHACQAAAAAAAEAAAAHACMAAAAAAAAAAAA=")
+tile_set = SubResource("TileSet_xbxml")
+
+[node name="Player" parent="." instance=ExtResource("2_gwu2e")]
+position = Vector2(313, 566)
