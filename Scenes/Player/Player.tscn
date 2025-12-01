@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=3 uid="uid://v8cl1k47mphc"]
+[gd_scene load_steps=39 format=3 uid="uid://v8cl1k47mphc"]
 
 [ext_resource type="Script" uid="uid://bje6d0s62rcm0" path="res://Scenes/Player/Player.cs" id="1_ft8w5"]
 [ext_resource type="Texture2D" uid="uid://baeiwgo7et423" path="res://assets/player/player.png" id="1_s0eop"]
@@ -21,6 +21,57 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_fk5o5"]
+resource_name = "attack1"
+length = 0.65
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [42, 43, 44, 45, 46, 47]
+}
+
+[sub_resource type="Animation" id="Animation_825xp"]
+resource_name = "attack2"
+length = 0.55
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [48, 49, 50, 51, 52]
+}
+
+[sub_resource type="Animation" id="Animation_ji083"]
+resource_name = "attack3"
+length = 0.55
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [53, 54, 55, 56, 57]
 }
 
 [sub_resource type="Animation" id="Animation_t26db"]
@@ -75,23 +126,6 @@ tracks/0/keys = {
 "values": [16, 17]
 }
 
-[sub_resource type="Animation" id="Animation_jmcll"]
-resource_name = "jump_start"
-length = 0.1
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.05),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [14, 15]
-}
-
 [sub_resource type="Animation" id="Animation_ude3g"]
 resource_name = "run"
 length = 0.6
@@ -110,57 +144,6 @@ tracks/0/keys = {
 "values": [8, 9, 10, 11, 12, 13]
 }
 
-[sub_resource type="Animation" id="Animation_fk5o5"]
-resource_name = "attack1"
-length = 0.6
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [42, 43, 44, 45, 46, 47]
-}
-
-[sub_resource type="Animation" id="Animation_825xp"]
-resource_name = "attack2"
-length = 0.5
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
-"update": 1,
-"values": [48, 49, 50, 51, 52]
-}
-
-[sub_resource type="Animation" id="Animation_ji083"]
-resource_name = "attack3"
-length = 0.5
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
-"update": 1,
-"values": [53, 54, 55, 56, 57]
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ude3g"]
 _data = {
 &"RESET": SubResource("Animation_h54ih"),
@@ -170,7 +153,6 @@ _data = {
 &"fall": SubResource("Animation_t26db"),
 &"idle": SubResource("Animation_ft8w5"),
 &"jump": SubResource("Animation_4wape"),
-&"jump_start": SubResource("Animation_jmcll"),
 &"run": SubResource("Animation_ude3g")
 }
 
@@ -185,7 +167,7 @@ advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_i5acl"]
 advance_mode = 2
-advance_expression = "int(velocity.y) > 0"
+advance_expression = "velocity.y > 0"
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_ft8w5"]
 states/Start/position = Vector2(163, 100)
@@ -228,9 +210,6 @@ transitions = ["Start", "attack1", SubResource("AnimationNodeStateMachineTransit
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ft8w5"]
 animation = &"idle"
 
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ude3g"]
-animation = &"jump_start"
-
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_h54ih"]
 animation = &"run"
 
@@ -241,14 +220,6 @@ advance_expression = "int(velocity.x) != 0"
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_4wape"]
 advance_mode = 2
 advance_expression = "int(velocity.x) == 0"
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_825xp"]
-advance_mode = 2
-advance_condition = &"jump"
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ji083"]
-advance_mode = 2
-advance_condition = &"jump"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_epg6k"]
 advance_mode = 2
@@ -271,20 +242,18 @@ states/Attack/position = Vector2(522, -2)
 states/Start/position = Vector2(218, 94)
 states/idle/node = SubResource("AnimationNodeAnimation_ft8w5")
 states/idle/position = Vector2(379, 88)
-states/jump_start/node = SubResource("AnimationNodeAnimation_ude3g")
-states/jump_start/position = Vector2(522, 179)
 states/run/node = SubResource("AnimationNodeAnimation_h54ih")
 states/run/position = Vector2(635, 88)
-transitions = ["idle", "run", SubResource("AnimationNodeStateMachineTransition_ude3g"), "run", "idle", SubResource("AnimationNodeStateMachineTransition_4wape"), "idle", "jump_start", SubResource("AnimationNodeStateMachineTransition_825xp"), "run", "jump_start", SubResource("AnimationNodeStateMachineTransition_ji083"), "Start", "idle", SubResource("AnimationNodeStateMachineTransition_epg6k"), "idle", "Attack", SubResource("AnimationNodeStateMachineTransition_spxdj"), "run", "Attack", SubResource("AnimationNodeStateMachineTransition_0objx"), "Attack", "idle", SubResource("AnimationNodeStateMachineTransition_ft8w5")]
+transitions = ["idle", "run", SubResource("AnimationNodeStateMachineTransition_ude3g"), "run", "idle", SubResource("AnimationNodeStateMachineTransition_4wape"), "Start", "idle", SubResource("AnimationNodeStateMachineTransition_epg6k"), "idle", "Attack", SubResource("AnimationNodeStateMachineTransition_spxdj"), "run", "Attack", SubResource("AnimationNodeStateMachineTransition_0objx"), "Attack", "idle", SubResource("AnimationNodeStateMachineTransition_ft8w5")]
 graph_offset = Vector2(3, -29)
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_t26db"]
 advance_mode = 2
-advance_expression = "int(velocity.y) != 0"
+advance_expression = "is_on_floor() != true"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_fk5o5"]
 advance_mode = 2
-advance_expression = "int(velocity.y) == 0"
+advance_expression = "is_on_floor() == true"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_0u84n"]
 advance_mode = 2
@@ -323,13 +292,8 @@ advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
 parameters/Ground/conditions/attack1 = false
 parameters/Ground/conditions/idle = false
-parameters/Ground/conditions/jump = false
 parameters/Ground/Attack/conditions/attack2 = false
 parameters/Ground/Attack/conditions/attack3 = false
-
-[node name="JumpTimer" type="Timer" parent="."]
-process_callback = 0
-one_shot = true
 
 [node name="AttackTimer" type="Timer" parent="."]
 one_shot = true
