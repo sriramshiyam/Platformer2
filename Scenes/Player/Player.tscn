@@ -1,7 +1,7 @@
-[gd_scene load_steps=39 format=3 uid="uid://v8cl1k47mphc"]
+[gd_scene load_steps=42 format=3 uid="uid://v8cl1k47mphc"]
 
 [ext_resource type="Script" uid="uid://bje6d0s62rcm0" path="res://Scenes/Player/Player.cs" id="1_ft8w5"]
-[ext_resource type="Texture2D" uid="uid://baeiwgo7et423" path="res://assets/player/player.png" id="1_s0eop"]
+[ext_resource type="Texture2D" uid="uid://dkqdmo5jtq4rk" path="res://assets/player/player.png" id="1_s0eop"]
 [ext_resource type="PackedScene" uid="uid://drmigprjyc5cx" path="res://Scenes/Camera/Camera.tscn" id="3_h54ih"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ft8w5"]
@@ -144,9 +144,27 @@ tracks/0/keys = {
 "values": [8, 9, 10, 11, 12, 13]
 }
 
+[sub_resource type="Animation" id="Animation_jmcll"]
+resource_name = "arrow_attack"
+length = 0.9
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [112, 113, 114, 115, 119, 120, 121, 122, 126]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ude3g"]
 _data = {
 &"RESET": SubResource("Animation_h54ih"),
+&"arrow_attack": SubResource("Animation_jmcll"),
 &"attack1": SubResource("Animation_fk5o5"),
 &"attack2": SubResource("Animation_825xp"),
 &"attack3": SubResource("Animation_ji083"),
@@ -177,6 +195,9 @@ states/jump/node = SubResource("AnimationNodeAnimation_825xp")
 states/jump/position = Vector2(333, 100)
 transitions = ["Start", "jump", SubResource("AnimationNodeStateMachineTransition_0kmp4"), "jump", "fall", SubResource("AnimationNodeStateMachineTransition_i5acl")]
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ude3g"]
+animation = &"arrow_attack"
+
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_jmcll"]
 animation = &"attack1"
 
@@ -188,6 +209,7 @@ animation = &"attack3"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_esmjy"]
 advance_mode = 2
+advance_condition = &"attack1"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_6tu5v"]
 advance_mode = 2
@@ -197,15 +219,21 @@ advance_condition = &"attack2"
 advance_mode = 2
 advance_condition = &"attack3"
 
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_jmcll"]
+advance_mode = 2
+advance_condition = &"arrow_attack"
+
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_6tu5v"]
 states/Start/position = Vector2(162, 88)
+states/arrow_attack/node = SubResource("AnimationNodeAnimation_ude3g")
+states/arrow_attack/position = Vector2(366, 147)
 states/attack1/node = SubResource("AnimationNodeAnimation_jmcll")
-states/attack1/position = Vector2(313, 88)
+states/attack1/position = Vector2(347, 50)
 states/attack2/node = SubResource("AnimationNodeAnimation_0kmp4")
-states/attack2/position = Vector2(480, 88)
+states/attack2/position = Vector2(502, 50)
 states/attack3/node = SubResource("AnimationNodeAnimation_i5acl")
-states/attack3/position = Vector2(641, 88)
-transitions = ["Start", "attack1", SubResource("AnimationNodeStateMachineTransition_esmjy"), "attack1", "attack2", SubResource("AnimationNodeStateMachineTransition_6tu5v"), "attack2", "attack3", SubResource("AnimationNodeStateMachineTransition_w71ue")]
+states/attack3/position = Vector2(664, 50)
+transitions = ["Start", "attack1", SubResource("AnimationNodeStateMachineTransition_esmjy"), "attack1", "attack2", SubResource("AnimationNodeStateMachineTransition_6tu5v"), "attack2", "attack3", SubResource("AnimationNodeStateMachineTransition_w71ue"), "Start", "arrow_attack", SubResource("AnimationNodeStateMachineTransition_jmcll")]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ft8w5"]
 animation = &"idle"
@@ -226,11 +254,11 @@ advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_spxdj"]
 advance_mode = 2
-advance_condition = &"attack1"
+advance_condition = &"attack"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_0objx"]
 advance_mode = 2
-advance_condition = &"attack1"
+advance_condition = &"attack"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ft8w5"]
 advance_mode = 2
@@ -241,9 +269,9 @@ states/Attack/node = SubResource("AnimationNodeStateMachine_6tu5v")
 states/Attack/position = Vector2(522, -2)
 states/Start/position = Vector2(218, 94)
 states/idle/node = SubResource("AnimationNodeAnimation_ft8w5")
-states/idle/position = Vector2(379, 88)
+states/idle/position = Vector2(364, 78)
 states/run/node = SubResource("AnimationNodeAnimation_h54ih")
-states/run/position = Vector2(635, 88)
+states/run/position = Vector2(660, 94)
 transitions = ["idle", "run", SubResource("AnimationNodeStateMachineTransition_ude3g"), "run", "idle", SubResource("AnimationNodeStateMachineTransition_4wape"), "Start", "idle", SubResource("AnimationNodeStateMachineTransition_epg6k"), "idle", "Attack", SubResource("AnimationNodeStateMachineTransition_spxdj"), "run", "Attack", SubResource("AnimationNodeStateMachineTransition_0objx"), "Attack", "idle", SubResource("AnimationNodeStateMachineTransition_ft8w5")]
 graph_offset = Vector2(3, -29)
 
@@ -272,7 +300,7 @@ script = ExtResource("1_ft8w5")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_s0eop")
 hframes = 7
-vframes = 16
+vframes = 20
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 3)
@@ -290,10 +318,19 @@ libraries = {
 tree_root = SubResource("AnimationNodeStateMachine_4wape")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
-parameters/Ground/conditions/attack1 = false
+parameters/Ground/conditions/attack = false
 parameters/Ground/conditions/idle = false
+parameters/Ground/Attack/conditions/arrow_attack = false
+parameters/Ground/Attack/conditions/attack1 = false
 parameters/Ground/Attack/conditions/attack2 = false
 parameters/Ground/Attack/conditions/attack3 = false
 
 [node name="AttackTimer" type="Timer" parent="."]
+wait_time = 0.7
 one_shot = true
+
+[node name="ArrowSpawnTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="ArrowSpawner" type="Marker2D" parent="."]
+position = Vector2(6, 3.12)

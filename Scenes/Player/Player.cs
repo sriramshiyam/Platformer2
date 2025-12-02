@@ -5,22 +5,42 @@ namespace Platformer2;
 
 public partial class Player : CharacterBody2D
 {
-	const float JUMP_SPEED = -280f;
+	#region MOVEMENT
+	const float JUMP_SPEED = -300f;
 	const float RUN_SPEED = 200f;
-	const string ATTACK1_PARAMETER_PATH = "parameters/Ground/conditions/attack1";
+	float Gravity;
+	#endregion
+
+	#region ANIMATION_TREE_PARAM
+	const string ATTACK_PARAMETER_PATH = "parameters/Ground/conditions/attack";
+	const string ARROW_ATTACK_PARAMETER_PATH = "parameters/Ground/Attack/conditions/arrow_attack";
+	const string ATTACK1_PARAMETER_PATH = "parameters/Ground/Attack/conditions/attack1";
 	const string ATTACK2_PARAMETER_PATH = "parameters/Ground/Attack/conditions/attack2";
 	const string ATTACK3_PARAMETER_PATH = "parameters/Ground/Attack/conditions/attack3";
 	const string IDLE_PARAMETER_PATH = "parameters/Ground/conditions/idle";
-	float Gravity;
+	#endregion
+
+	#region ANIMATION;
 	Sprite2D sprite;
 	AnimationTree animationTree;
 	AnimationPlayer animationPlayer;
-	Timer attackTimer;
+	#endregion
+
 	Camera camera;
+
+	#region ATTACK
+	Timer arrowSpawnTimer;
+	float arrowSpawnTime;
+	Marker2D arrowSpawner;
+	Timer attackTimer;
 	float attack1AnimDuration;
 	float attack2AnimDuration;
 	float attack3AnimDuration;
+	float arrowAttackDuration;
 	bool isAttacking = false;
+	Tween attackForceTween = null;
+	#endregion
+
 	List<(string paramPath, float animDuration, bool added)> attackInfoList;
 	Dictionary<string, float> attackDeltaForce;
 
@@ -28,24 +48,34 @@ public partial class Player : CharacterBody2D
 	{
 		attackInfoList = new List<(string, float, bool)>();
 		attackDeltaForce = new Dictionary<string, float>();
-		Gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() / 1.75f;
+		Gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
 
 		sprite = GetNode<Sprite2D>("Sprite2D");
 		camera = GetNode<Camera>("Camera");
 		animationTree = GetNode<AnimationTree>("AnimationTree");
 		animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 		attackTimer = GetNode<Timer>("AttackTimer");
+		arrowSpawnTimer = GetNode<Timer>("ArrowSpawnTimer");
+		arrowSpawner = GetNode<Marker2D>("ArrowSpawner");
+		arrowSpawnTime = 0.7f;
 
 		attackTimer.Timeout += OnAttackTimerTimeOut;
+		arrowSpawnTimer.Timeout += OnArrowSpawnTimerTimeOut;
 
 		StoreAnimationDurationTime();
 		StoreAttackDeltaForce();
+	}
+
+	private void OnArrowSpawnTimerTimeOut()
+	{
+		SignalBus.I.EmitSpawnArrow(arrowSpawner.GlobalPosition, sprite.FlipH);
 	}
 
 	public override void _Process(double delta)
 	{
 		HandleFlip();
 		HandleAttack();
+		HandleArrowAttack();
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -75,9 +105,17 @@ public partial class Player : CharacterBody2D
 			}
 		}
 
+		GD.Print("ATTACK CLEARED");
+		ClearAttackParam();
+	}
+
+	private void ClearAttackParam()
+	{
 		attackInfoList.Clear();
 
 		isAttacking = false;
+		animationTree.Set(ATTACK_PARAMETER_PATH, false);
+		animationTree.Set(ARROW_ATTACK_PARAMETER_PATH, false);
 		animationTree.Set(ATTACK1_PARAMETER_PATH, false);
 		animationTree.Set(ATTACK2_PARAMETER_PATH, false);
 		animationTree.Set(ATTACK3_PARAMETER_PATH, false);
@@ -89,6 +127,7 @@ public partial class Player : CharacterBody2D
 		attack1AnimDuration = animationPlayer.GetAnimation("attack1").Length;
 		attack2AnimDuration = animationPlayer.GetAnimation("attack2").Length;
 		attack3AnimDuration = animationPlayer.GetAnimation("attack3").Length;
+		arrowAttackDuration = animationPlayer.GetAnimation("arrow_attack").Length;
 	}
 
 	private void StoreAttackDeltaForce()
@@ -102,17 +141,24 @@ public partial class Player : CharacterBody2D
 	{
 		if (!IsOnFloor())
 		{
+			if (attackForceTween != null && attackForceTween.IsRunning())
+			{
+				GD.Print("TWEEN STOPPED");
+				attackForceTween.Stop();
+				ClearAttackParam();
+			}
+
+			float gravity = Velocity.Y < 0f ? (Gravity / 1.7f) : (Gravity / 2f);
 			Vector2 velocity = Velocity;
-			velocity.Y += Gravity * (float)delta;
+			velocity.Y += gravity * (float)delta;
 			Velocity = velocity;
 		}
 	}
 
 	private void HandleJump()
 	{
-		if (!isAttacking && Input.IsActionJustPressed("space") && IsOnFloor())
+		if (!isAttacking && Input.IsActionJustPressed("jump") && IsOnFloor())
 		{
-			isAttacking = false;
 			Vector2 velocity = Velocity;
 			velocity.Y = JUMP_SPEED;
 			Velocity = velocity;
@@ -140,9 +186,9 @@ public partial class Player : CharacterBody2D
 		}
 	}
 
-	private async void HandleAttack()
+	private void HandleAttack()
 	{
-		if (!Mathf.IsZeroApprox(Velocity.Y))
+		if (!IsOnFloor() || animationTree.Get(ARROW_ATTACK_PARAMETER_PATH).AsBool())
 		{
 			return;
 		}
@@ -154,6 +200,7 @@ public partial class Player : CharacterBody2D
 		{
 			isAttacking = true;
 			animationTree.Set(IDLE_PARAMETER_PATH, false);
+			animationTree.Set(ATTACK_PARAMETER_PATH, true);
 			animationTree.Set(ATTACK1_PARAMETER_PATH, true);
 			attackTimer.Start(attack1AnimDuration);
 			CreateAttackForceTween(ATTACK1_PARAMETER_PATH);
@@ -171,9 +218,31 @@ public partial class Player : CharacterBody2D
 		}
 	}
 
+	private void HandleArrowAttack()
+	{
+		if (!IsOnFloor() || animationTree.Get(ATTACK1_PARAMETER_PATH).AsBool())
+		{
+			return;
+		}
+
+		bool arrowAttackButtonPressed = Input.IsActionJustPressed("arrow_attack");
+		bool canArrowAttack = arrowAttackButtonPressed && !animationTree.Get(ARROW_ATTACK_PARAMETER_PATH).AsBool();
+
+		if (canArrowAttack)
+		{
+			Velocity = Vector2.Zero;
+			isAttacking = true;
+			animationTree.Set(IDLE_PARAMETER_PATH, false);
+			animationTree.Set(ATTACK_PARAMETER_PATH, true);
+			animationTree.Set(ARROW_ATTACK_PARAMETER_PATH, true);
+			attackTimer.Start(arrowAttackDuration);
+			arrowSpawnTimer.Start(arrowSpawnTime);
+		}
+	}
+
 	private void CreateAttackForceTween(string attackPath)
 	{
-		var tween = CreateTween();
+		attackForceTween = CreateTween();
 
 		float deltaForce = attackDeltaForce[attackPath];
 		if (sprite.FlipH)
@@ -181,7 +250,7 @@ public partial class Player : CharacterBody2D
 			deltaForce *= -1;
 		}
 
-		tween.TweenProperty(this, "velocity", new Vector2(deltaForce, Velocity.Y), 0f);
+		attackForceTween.TweenProperty(this, "velocity", new Vector2(deltaForce, Velocity.Y), 0f);
 
 		float attackDuration;
 		if (attackPath == ATTACK1_PARAMETER_PATH)
@@ -197,6 +266,6 @@ public partial class Player : CharacterBody2D
 			attackDuration = attack3AnimDuration;
 		}
 
-		tween.TweenProperty(this, "velocity", new Vector2(0f, Velocity.Y), attackDuration);
+		attackForceTween.TweenProperty(this, "velocity", new Vector2(0f, Velocity.Y), attackDuration);
 	}
 }
