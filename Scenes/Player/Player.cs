@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -13,17 +12,18 @@ public partial class Player : CharacterBody2D
 	#endregion
 
 	#region ANIMATION_TREE_PARAM
-	const string ATTACK_PARAMETER_PATH = "parameters/Ground/conditions/attack";
-	const string ARROW_ATTACK_PARAMETER_PATH = "parameters/Ground/Attack/conditions/arrow_attack";
-	const string ATTACK1_PARAMETER_PATH = "parameters/Ground/Attack/conditions/attack1";
-	const string ATTACK2_PARAMETER_PATH = "parameters/Ground/Attack/conditions/attack2";
-	const string ATTACK3_PARAMETER_PATH = "parameters/Ground/Attack/conditions/attack3";
-	const string IDLE_PARAMETER_PATH = "parameters/Ground/conditions/idle";
-	const string AIR_ATTACK_PARAMETER_PATH = "parameters/Air/conditions/attack";
-	const string JUMP_PARAMETER_PATH = "parameters/Air/conditions/jump";
-	const string FALL_PARAMETER_PATH = "parameters/Air/conditions/fall";
-	const string AIR_ATTACK1_PARAMETER_PATH = "parameters/Air/Attack/conditions/air_attack1";
-	const string AIR_ATTACK2_PARAMETER_PATH = "parameters/Air/Attack/conditions/air_attack2";
+	const string ATTACK_PARAM_PATH = "parameters/Ground/conditions/attack";
+	const string ARROW_ATTACK_PARAM_PATH = "parameters/Ground/Attack/conditions/arrow_attack";
+	const string ATTACK1_PARAM_PATH = "parameters/Ground/Attack/conditions/attack1";
+	const string ATTACK2_PARAM_PATH = "parameters/Ground/Attack/conditions/attack2";
+	const string ATTACK3_PARAM_PATH = "parameters/Ground/Attack/conditions/attack3";
+	const string IDLE_PARAM_PATH = "parameters/Ground/conditions/idle";
+	const string AIR_ATTACK_PARAM_PATH = "parameters/Air/conditions/attack";
+	const string JUMP_PARAM_PATH = "parameters/Air/conditions/jump";
+	const string FALL_PARAM_PATH = "parameters/Air/conditions/fall";
+	const string AIR_ATTACK1_PARAM_PATH = "parameters/Air/Attack/conditions/air_attack1";
+	const string AIR_ATTACK2_PARAM_PATH = "parameters/Air/Attack/conditions/air_attack2";
+	const string AIR_ARROW_ATTACK_PARAM_PATH = "parameters/Air/Attack/conditions/air_arrow_attack";
 	#endregion
 
 	#region ANIMATION;
@@ -58,7 +58,10 @@ public partial class Player : CharacterBody2D
 	Timer airAttackTimer;
 	float airAttack1AnimDuration;
 	float airAttack2AnimDuration;
+	float airArrowAttackDuration;
 	int canAirAttack2 = 0;
+	Marker2D airArrowSpawner;
+	const float AIR_ARROW_SPAWN_TIME = 0.28f;
 	#endregion
 
 	List<(string paramPath, float animDuration, bool added)> attackInfoList;
@@ -77,7 +80,8 @@ public partial class Player : CharacterBody2D
 		attackTimer = GetNode<Timer>("Timers/AttackTimer");
 		arrowSpawnTimer = GetNode<Timer>("Timers/ArrowSpawnTimer");
 		airAttackTimer = GetNode<Timer>("Timers/AirAttackTimer");
-		arrowSpawner = GetNode<Marker2D>("ArrowSpawner");
+		arrowSpawner = GetNode<Marker2D>("ArrowSpawners/ArrowSpawner");
+		airArrowSpawner = GetNode<Marker2D>("ArrowSpawners/AirArrowSpawner");
 		audioStreamPlayer = GetNode<AudioStreamPlayer2D>("Sound");
 
 		attackTimer.Timeout += OnAttackTimerTimeOut;
@@ -94,6 +98,7 @@ public partial class Player : CharacterBody2D
 		HandleAttack();
 		HandleArrowAttack();
 		HandleAirAttack();
+		HandleAirArrowAttack();
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -110,7 +115,7 @@ public partial class Player : CharacterBody2D
 		{
 			canAirAttack2 = -1;
 			animationTree.Advance(0f);
-			animationTree.Set(AIR_ATTACK2_PARAMETER_PATH, true);
+			animationTree.Set(AIR_ATTACK2_PARAM_PATH, true);
 			airAttackTimer.Start(airAttack2AnimDuration);
 			audioStreamPlayer.VolumeDb = ATTACK_DECIBEL;
 			SoundManager.I.PlaySound(audioStreamPlayer, SoundManager.I.ATTACK_SOUND);
@@ -123,17 +128,18 @@ public partial class Player : CharacterBody2D
 	private void ClearAirAttackParam()
 	{
 		canAirAttack2 = 0;
-		animationTree.Set(AIR_ATTACK_PARAMETER_PATH, false);
-		animationTree.Set(AIR_ATTACK1_PARAMETER_PATH, false);
-		animationTree.Set(AIR_ATTACK2_PARAMETER_PATH, false);
+		animationTree.Set(AIR_ATTACK_PARAM_PATH, false);
+		animationTree.Set(AIR_ATTACK1_PARAM_PATH, false);
+		animationTree.Set(AIR_ATTACK2_PARAM_PATH, false);
+		animationTree.Set(AIR_ARROW_ATTACK_PARAM_PATH, false);
 
 		if (Velocity.Y < 0)
 		{
-			animationTree.Set(JUMP_PARAMETER_PATH, true);
+			animationTree.Set(JUMP_PARAM_PATH, true);
 		}
 		else
 		{
-			animationTree.Set(FALL_PARAMETER_PATH, true);
+			animationTree.Set(FALL_PARAM_PATH, true);
 		}
 	}
 
@@ -141,7 +147,8 @@ public partial class Player : CharacterBody2D
 	{
 		audioStreamPlayer.VolumeDb = ARROW_ATTACK_DECIBEL;
 		SoundManager.I.PlaySound(audioStreamPlayer, SoundManager.I.ARROW_ATTACK_SOUND);
-		SignalBus.I.EmitSpawnArrow(arrowSpawner.GlobalPosition, sprite.FlipH);
+		Vector2 arrowPosition = IsOnFloor() ? arrowSpawner.GlobalPosition : airArrowSpawner.GlobalPosition;
+		SignalBus.I.EmitSpawnArrow(arrowPosition, sprite.FlipH);
 	}
 
 	private void OnAttackTimerTimeOut()
@@ -173,12 +180,12 @@ public partial class Player : CharacterBody2D
 		attackInfoList.Clear();
 
 		isAttacking = false;
-		animationTree.Set(ATTACK_PARAMETER_PATH, false);
-		animationTree.Set(ARROW_ATTACK_PARAMETER_PATH, false);
-		animationTree.Set(ATTACK1_PARAMETER_PATH, false);
-		animationTree.Set(ATTACK2_PARAMETER_PATH, false);
-		animationTree.Set(ATTACK3_PARAMETER_PATH, false);
-		animationTree.Set(IDLE_PARAMETER_PATH, true);
+		animationTree.Set(ATTACK_PARAM_PATH, false);
+		animationTree.Set(ARROW_ATTACK_PARAM_PATH, false);
+		animationTree.Set(ATTACK1_PARAM_PATH, false);
+		animationTree.Set(ATTACK2_PARAM_PATH, false);
+		animationTree.Set(ATTACK3_PARAM_PATH, false);
+		animationTree.Set(IDLE_PARAM_PATH, true);
 	}
 
 	private void StoreAnimationDurationTime()
@@ -189,13 +196,14 @@ public partial class Player : CharacterBody2D
 		arrowAttackDuration = animationPlayer.GetAnimation("arrow_attack").Length;
 		airAttack1AnimDuration = animationPlayer.GetAnimation("air_attack1").Length;
 		airAttack2AnimDuration = animationPlayer.GetAnimation("air_attack2").Length;
+		airArrowAttackDuration = animationPlayer.GetAnimation("air_arrow_attack").Length;
 	}
 
 	private void StoreAttackDeltaForce()
 	{
-		attackDeltaForce[ATTACK1_PARAMETER_PATH] = 80f;
-		attackDeltaForce[ATTACK2_PARAMETER_PATH] = 80f;
-		attackDeltaForce[ATTACK3_PARAMETER_PATH] = 200f;
+		attackDeltaForce[ATTACK1_PARAM_PATH] = 80f;
+		attackDeltaForce[ATTACK2_PARAM_PATH] = 80f;
+		attackDeltaForce[ATTACK3_PARAM_PATH] = 200f;
 	}
 
 	private void HandleGravity(double delta)
@@ -250,23 +258,23 @@ public partial class Player : CharacterBody2D
 
 	private void HandleAttack()
 	{
-		if (!IsOnFloor() || animationTree.Get(ARROW_ATTACK_PARAMETER_PATH).AsBool())
+		if (!IsOnFloor() || animationTree.Get(ARROW_ATTACK_PARAM_PATH).AsBool())
 		{
 			return;
 		}
 
 		bool attackButtonPressed = Input.IsActionJustPressed("attack");
-		bool canAttack1 = attackButtonPressed && !animationTree.Get(ATTACK1_PARAMETER_PATH).AsBool();
+		bool canAttack1 = attackButtonPressed && !animationTree.Get(ATTACK1_PARAM_PATH).AsBool();
 
 		if (canAttack1)
 		{
 			isAttacking = true;
 			animationTree.Advance(0f);
-			animationTree.Set(IDLE_PARAMETER_PATH, false);
-			animationTree.Set(ATTACK_PARAMETER_PATH, true);
-			animationTree.Set(ATTACK1_PARAMETER_PATH, true);
+			animationTree.Set(IDLE_PARAM_PATH, false);
+			animationTree.Set(ATTACK_PARAM_PATH, true);
+			animationTree.Set(ATTACK1_PARAM_PATH, true);
 			attackTimer.Start(attack1AnimDuration);
-			CreateAttackForceTween(ATTACK1_PARAMETER_PATH);
+			CreateAttackForceTween(ATTACK1_PARAM_PATH);
 			audioStreamPlayer.VolumeDb = ATTACK_DECIBEL;
 			SoundManager.I.PlaySound(audioStreamPlayer, SoundManager.I.ATTACK_SOUND);
 		}
@@ -274,33 +282,33 @@ public partial class Player : CharacterBody2D
 		{
 			if (attackInfoList.Count == 0)
 			{
-				attackInfoList.Add((ATTACK2_PARAMETER_PATH, attack2AnimDuration, false));
+				attackInfoList.Add((ATTACK2_PARAM_PATH, attack2AnimDuration, false));
 			}
 			else
 			{
-				attackInfoList.Add((ATTACK3_PARAMETER_PATH, attack3AnimDuration, false));
+				attackInfoList.Add((ATTACK3_PARAM_PATH, attack3AnimDuration, false));
 			}
 		}
 	}
 
 	private void HandleArrowAttack()
 	{
-		if (!IsOnFloor() || animationTree.Get(ATTACK1_PARAMETER_PATH).AsBool())
+		if (!IsOnFloor() || animationTree.Get(ATTACK1_PARAM_PATH).AsBool())
 		{
 			return;
 		}
 
 		bool arrowAttackButtonPressed = Input.IsActionJustPressed("arrow_attack");
-		bool canArrowAttack = arrowAttackButtonPressed && !animationTree.Get(ARROW_ATTACK_PARAMETER_PATH).AsBool();
+		bool canArrowAttack = arrowAttackButtonPressed && !animationTree.Get(ARROW_ATTACK_PARAM_PATH).AsBool();
 
 		if (canArrowAttack)
 		{
 			Velocity = Vector2.Zero;
 			isAttacking = true;
 			animationTree.Advance(0f);
-			animationTree.Set(IDLE_PARAMETER_PATH, false);
-			animationTree.Set(ATTACK_PARAMETER_PATH, true);
-			animationTree.Set(ARROW_ATTACK_PARAMETER_PATH, true);
+			animationTree.Set(IDLE_PARAM_PATH, false);
+			animationTree.Set(ATTACK_PARAM_PATH, true);
+			animationTree.Set(ARROW_ATTACK_PARAM_PATH, true);
 			attackTimer.Start(arrowAttackDuration);
 			arrowSpawnTimer.Start(ARROW_SPAWN_TIME);
 		}
@@ -319,11 +327,11 @@ public partial class Player : CharacterBody2D
 		attackForceTween.TweenProperty(this, "velocity", new Vector2(deltaForce, Velocity.Y), 0f);
 
 		float attackDuration;
-		if (attackPath == ATTACK1_PARAMETER_PATH)
+		if (attackPath == ATTACK1_PARAM_PATH)
 		{
 			attackDuration = attack1AnimDuration;
 		}
-		else if (attackPath == ATTACK2_PARAMETER_PATH)
+		else if (attackPath == ATTACK2_PARAM_PATH)
 		{
 			attackDuration = attack2AnimDuration;
 		}
@@ -337,21 +345,21 @@ public partial class Player : CharacterBody2D
 
 	private void HandleAirAttack()
 	{
-		if (IsOnFloor())
+		if (IsOnFloor() || animationTree.Get(AIR_ARROW_ATTACK_PARAM_PATH).AsBool())
 		{
 			return;
 		}
 
 		bool attackButtonPressed = Input.IsActionJustPressed("attack");
-		bool canAirAttack = attackButtonPressed && !animationTree.Get(AIR_ATTACK1_PARAMETER_PATH).AsBool();
+		bool canAirAttack = attackButtonPressed && !animationTree.Get(AIR_ATTACK1_PARAM_PATH).AsBool();
 
 		if (canAirAttack)
 		{
 			animationTree.Advance(0f);
-			animationTree.Set(JUMP_PARAMETER_PATH, false);
-			animationTree.Set(FALL_PARAMETER_PATH, false);
-			animationTree.Set(AIR_ATTACK_PARAMETER_PATH, true);
-			animationTree.Set(AIR_ATTACK1_PARAMETER_PATH, true);
+			animationTree.Set(JUMP_PARAM_PATH, false);
+			animationTree.Set(FALL_PARAM_PATH, false);
+			animationTree.Set(AIR_ATTACK_PARAM_PATH, true);
+			animationTree.Set(AIR_ATTACK1_PARAM_PATH, true);
 			airAttackTimer.Start(airAttack1AnimDuration);
 			audioStreamPlayer.VolumeDb = ATTACK_DECIBEL;
 			SoundManager.I.PlaySound(audioStreamPlayer, SoundManager.I.ATTACK_SOUND);
@@ -359,6 +367,28 @@ public partial class Player : CharacterBody2D
 		else if (attackButtonPressed && canAirAttack2 == 0)
 		{
 			canAirAttack2++;
+		}
+	}
+
+	private void HandleAirArrowAttack()
+	{
+		if (IsOnFloor() || animationTree.Get(AIR_ATTACK1_PARAM_PATH).AsBool())
+		{
+			return;
+		}
+
+		bool arrowAttackButtonPressed = Input.IsActionJustPressed("arrow_attack");
+		bool canArrowAttack = arrowAttackButtonPressed && !animationTree.Get(AIR_ARROW_ATTACK_PARAM_PATH).AsBool();
+
+		if (canArrowAttack)
+		{
+			animationTree.Advance(0f);
+			animationTree.Set(JUMP_PARAM_PATH, false);
+			animationTree.Set(FALL_PARAM_PATH, false);
+			animationTree.Set(AIR_ATTACK_PARAM_PATH, true);
+			animationTree.Set(AIR_ARROW_ATTACK_PARAM_PATH, true);
+			airAttackTimer.Start(airArrowAttackDuration);
+			arrowSpawnTimer.Start(AIR_ARROW_SPAWN_TIME);
 		}
 	}
 }
