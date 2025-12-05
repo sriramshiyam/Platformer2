@@ -6,7 +6,7 @@ namespace Platformer2;
 public partial class Player : CharacterBody2D
 {
 	#region MOVEMENT
-	const float JUMP_SPEED = -250f;
+	const float JUMP_SPEED = -350f;
 	const float RUN_SPEED = 250f;
 	float Gravity;
 	#endregion
@@ -61,7 +61,7 @@ public partial class Player : CharacterBody2D
 	float airArrowAttackDuration;
 	int canAirAttack2 = 0;
 	Marker2D airArrowSpawner;
-	const float AIR_ARROW_SPAWN_TIME = 0.28f;
+	const float AIR_ARROW_SPAWN_TIME = 0.3f;
 	#endregion
 
 	List<(string paramPath, float animDuration, bool added)> attackInfoList;
@@ -208,7 +208,7 @@ public partial class Player : CharacterBody2D
 
 	private void HandleGravity(double delta)
 	{
-		if (!IsOnFloor())
+		if (!IsOnFloor() && !animationTree.Get(AIR_ARROW_ATTACK_PARAM_PATH).AsBool())
 		{
 			if (attackForceTween != null && attackForceTween.IsRunning())
 			{
@@ -216,9 +216,9 @@ public partial class Player : CharacterBody2D
 				ClearAttackParam();
 			}
 
-			float gravity = Velocity.Y < 0f ? (Gravity / 1.7f) : (Gravity / 2f);
+			// float gravity = Velocity.Y < 0f ? (Gravity / 1.7f) : (Gravity / 2f);
 			Vector2 velocity = Velocity;
-			velocity.Y += gravity * (float)delta;
+			velocity.Y += Gravity * (float)delta;
 			Velocity = velocity;
 		}
 	}
@@ -237,7 +237,7 @@ public partial class Player : CharacterBody2D
 
 	private void HandleMovement()
 	{
-		if (!isAttacking)
+		if (!isAttacking && !animationTree.Get(AIR_ARROW_ATTACK_PARAM_PATH).AsBool())
 		{
 			Vector2 velocity = Velocity;
 			float axis = Input.GetAxis("left", "right");
@@ -382,6 +382,7 @@ public partial class Player : CharacterBody2D
 
 		if (canArrowAttack)
 		{
+			Velocity = Vector2.Zero;
 			animationTree.Advance(0f);
 			animationTree.Set(JUMP_PARAM_PATH, false);
 			animationTree.Set(FALL_PARAM_PATH, false);
